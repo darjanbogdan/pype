@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype", "src\Pype\Pype.csproj", "{322F3805-B4EC-4ACE-ADCE-3202E8510176}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Sandbox", "src\Pype.Sandbox\Pype.Sandbox.csproj", "{8C4AF8CD-A07F-418B-8537-8D496C3B21F2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Validation", "src\Pype.Validation\Pype.Validation.csproj", "{D8A302B5-AE1C-4F46-A377-42CD712C86EA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{322F3805-B4EC-4ACE-ADCE-3202E8510176}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{322F3805-B4EC-4ACE-ADCE-3202E8510176}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{322F3805-B4EC-4ACE-ADCE-3202E8510176}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{322F3805-B4EC-4ACE-ADCE-3202E8510176}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C4AF8CD-A07F-418B-8537-8D496C3B21F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C4AF8CD-A07F-418B-8537-8D496C3B21F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C4AF8CD-A07F-418B-8537-8D496C3B21F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C4AF8CD-A07F-418B-8537-8D496C3B21F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8A302B5-AE1C-4F46-A377-42CD712C86EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8A302B5-AE1C-4F46-A377-42CD712C86EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8A302B5-AE1C-4F46-A377-42CD712C86EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8A302B5-AE1C-4F46-A377-42CD712C86EA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {29790640-855D-4D2D-A4A5-F851C69E597B}
+	EndGlobalSection
+EndGlobal
