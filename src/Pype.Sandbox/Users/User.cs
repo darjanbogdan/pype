@@ -4,7 +4,5 @@ using System.Text;
 
 namespace Pype.Sandbox.Users
 {
-    public class User
-    {
-    }
+    public class User { }
 }

@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 
 namespace Pype.Sandbox.Users
 {
-    public class DeleteUserRequest : IRequest
-    {
-    }
+    public class DeleteUserCommand : IRequest { }
 
-    public class DeleteUserHandler : IRequestHandler<DeleteUserRequest>
+    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand>
     {
-        public Task<Result<Unit>> HandleAsync(DeleteUserRequest request, CancellationToken cancellation = default)
+        public Task<Result<Unit>> HandleAsync(DeleteUserCommand command, CancellationToken cancellation = default)
         {
             return Result.OkAsync(Unit.Value);
         }

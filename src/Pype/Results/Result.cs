@@ -11,19 +11,13 @@ namespace Pype
 
         private readonly bool _successful;
 
-        private Result(bool successful)
-        {
-            _successful = successful;
-        }
-
         private Result(TData data)
-            : this(successful: true)
         {
+            _successful = true;
             _data = data;
         }
 
         private Result(Error error)
-            : this(successful: false)
         {
             _error = error;
         }

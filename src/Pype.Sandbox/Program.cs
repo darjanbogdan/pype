@@ -1,9 +1,9 @@
 ﻿using Pype.Notifications;
 using Pype.Requests;
 using Pype.Sandbox.Users;
-using Pype.Validation;
 using SimpleInjector;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Pype.Sandbox
@@ -13,28 +13,28 @@ namespace Pype.Sandbox
         async static Task Main(string[] args)
         {
             var asm = typeof(Program).Assembly;
-            var valAsm = typeof(ValidationException).Assembly;
 
+            var pype = CreatePype(asm);
+            
+            await pype.SendAsync(new CreateUserCommand());
+
+            await pype.PublishAsync(new UserCreatedNotification());
+            await pype.PublishAsync(new UserExtendedCreatedNotification());
+        }
+
+        private static IBus CreatePype(params Assembly[] assemblies)
+        {
             var container = new Container();
 
-            container.Register(typeof(IRequestHandler<,>), new[] { asm });
-            container.RegisterDecorator(typeof(IRequestHandler<,>), typeof(RequestHandlerValidationDecorator<,>));
+            container.Register(typeof(IRequestHandler<,>), assemblies);
 
-            container.Collection.Register(typeof(INotificationHandler<>), new[] { asm });
+            container.Collection.Register(typeof(INotificationHandler<>), assemblies);
 
-            container.Register<IBus>(() => new Bus(container.GetInstance));
-
-            container.Collection.Register(typeof(IValidator<>), new[] { asm });
+            container.RegisterSingleton<IBus>(() => new Bus(container.GetInstance));
 
             container.Verify();
 
-            var bus = container.GetInstance<IBus>();
-
-            var result = await bus.SendAsync(new CreateUserRequest());
-
-            await bus.PublishAsync(new UserCreatedNotification());
-            await bus.PublishAsync(new UserExtendedCreatedNotification());
+            return container.GetInstance<IBus>();
         }
-
     }
 }

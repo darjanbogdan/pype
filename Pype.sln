@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Sandbox", "src\Pype.Sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Validation", "src\Pype.Validation\Pype.Validation.csproj", "{D8A302B5-AE1C-4F46-A377-42CD712C86EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pype.Benchmark", "src\Pype.Benchmark\Pype.Benchmark.csproj", "{A7C7252B-D580-4DFB-AAC8-BC17316D0FE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D8A302B5-AE1C-4F46-A377-42CD712C86EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8A302B5-AE1C-4F46-A377-42CD712C86EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8A302B5-AE1C-4F46-A377-42CD712C86EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7C7252B-D580-4DFB-AAC8-BC17316D0FE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7C7252B-D580-4DFB-AAC8-BC17316D0FE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7C7252B-D580-4DFB-AAC8-BC17316D0FE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7C7252B-D580-4DFB-AAC8-BC17316D0FE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
