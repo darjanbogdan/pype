@@ -5,10 +5,26 @@ using System.Threading.Tasks;
 
 namespace Pype
 {
+    /// <summary>
+    /// Defines in-process bus for requests, notifications and handlers
+    /// </summary>
     public interface IBus
     {
-        Task<Result<TResponse>> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellation = default);
+        /// <summary>
+        /// Sends the request to matching request handler.
+        /// </summary>
+        /// <typeparam name="TResponse">The type of the response.</typeparam>
+        /// <param name="request">The request.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns></returns>
+        Task<Result<TResponse>> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
 
-        Task PublishAsync(INotification notification, CancellationToken cancellation = default);
+        /// <summary>
+        /// Publishes the notification to matching notification handlers.
+        /// </summary>
+        /// <param name="notification">The notification.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns></returns>
+        Task PublishAsync(INotification notification, CancellationToken cancellationToken = default);
     }
 }

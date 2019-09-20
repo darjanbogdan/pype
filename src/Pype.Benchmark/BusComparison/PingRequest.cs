@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pype.Benchmarks.Bus
+namespace Pype.Benchmarks.BusComparison
 {
     public class PingRequest : 
         Requests.IRequest<PingResponse>, 

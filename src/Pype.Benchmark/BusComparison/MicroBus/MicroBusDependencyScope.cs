@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Pype.Benchmarks.Bus
+namespace Pype.Benchmarks.BusComparison
 {
     public class MicroBusDependencyScope : MicroBusDependencyResolver, IDependencyScope
     {

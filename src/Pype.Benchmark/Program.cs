@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
-using Pype.Benchmarks.Bus;
+using Pype.Benchmarks.BusComparison;
 using Pype.Benchmarks.SendComparison;
 using Pype.Benchmarks.SendComparison.DelegateDynamicInvoke;
 using SimpleInjector;
@@ -21,22 +21,20 @@ namespace Pype.Benchmarks
             BenchmarkRunner.Run<BusComparisonBenchmarks>(); 
             BenchmarkRunner.Run<SendComparisonBenchmarks>();
 #else
-            var assemblies = new[] { typeof(Pype.Bus).Assembly, typeof(Bus.PingRequest).Assembly };
+            var assemblies = new[] { typeof(Bus).Assembly, typeof(BusComparison.PingRequest).Assembly };
 
             Container container = new Container();
             container.Options.DefaultLifestyle = Lifestyle.Transient;
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
-            container.Register(typeof(Pype.Requests.IRequestHandler<,>), assemblies);
-            container.RegisterSingleton<IBusDelegateDynamicInvoke>(() => new BusDelegateDynamicInvoke(container.GetInstance));
+            container.Register(typeof(Requests.IRequestHandler<,>), assemblies);
+            container.RegisterSingleton<IBus>(() => new Bus(container.GetInstance));
 
             container.Verify();
 
-            IBusDelegateDynamicInvoke busComparison = container.GetInstance<IBusDelegateDynamicInvoke>();
+            IBus bus = container.GetInstance<IBus>();
 
-            var response = await busComparison.SendAsync(new Bus.PingRequest());
-
-            var responseCached = await busComparison.SendCachedAsync(new Bus.PingRequest());
+            var response = await bus.SendAsync(new BusComparison.PingRequest());
 
             Console.WriteLine(response.Match<bool>(r => true, e => false));
 #endif

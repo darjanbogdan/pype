@@ -2,10 +2,18 @@
 
 namespace Pype
 {
-    public sealed class Error
+    /// <summary>
+    /// Structure which holds error data.
+    /// </summary>
+    public class Error
     {
-        public static readonly Error Empty = new Error(message: string.Empty);
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Error"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="data">The data.</param>
+        /// <param name="code">The code.</param>
+        /// <exception cref="ArgumentNullException">message</exception>
         public Error(string message, object data = default, int? code = default)
         {
             Message = message ?? throw new ArgumentNullException(nameof(message));
@@ -13,10 +21,19 @@ namespace Pype
             Code = code;
         }
 
+        /// <summary>
+        /// Gets the code.
+        /// </summary>
         public int? Code { get; }
 
+        /// <summary>
+        /// Gets the data.
+        /// </summary>
         public object Data { get; }
 
+        /// <summary>
+        /// Gets the message.
+        /// </summary>
         public string Message { get; }
     }
 }

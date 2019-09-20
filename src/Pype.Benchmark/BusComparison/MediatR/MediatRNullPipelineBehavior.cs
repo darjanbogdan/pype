@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pype.Benchmarks.Bus
+namespace Pype.Benchmarks.BusComparison
 {
     public class MediatRNullPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {

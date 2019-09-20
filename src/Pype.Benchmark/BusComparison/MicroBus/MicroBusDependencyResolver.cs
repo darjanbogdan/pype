@@ -1,7 +1,7 @@
 ﻿using Enexure.MicroBus;
 using SimpleInjector;
 
-namespace Pype.Benchmarks.Bus
+namespace Pype.Benchmarks.BusComparison
 {
     public class MicroBusDependencyResolver : IDependencyResolver
     {
