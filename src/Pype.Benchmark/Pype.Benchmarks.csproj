@@ -5,8 +5,13 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="Enexure.MicroBus" Version="3.6.2" />
     <PackageReference Include="MediatR" Version="7.0.0" />
     <PackageReference Include="SimpleInjector" Version="4.7.1" />
   </ItemGroup>

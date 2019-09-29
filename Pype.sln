@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Sandbox", "src\Pype.Sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Validation", "src\Pype.Validation\Pype.Validation.csproj", "{D8A302B5-AE1C-4F46-A377-42CD712C86EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pype.Benchmark", "src\Pype.Benchmark\Pype.Benchmark.csproj", "{A7C7252B-D580-4DFB-AAC8-BC17316D0FE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Benchmarks", "src\Pype.Benchmark\Pype.Benchmarks.csproj", "{A7C7252B-D580-4DFB-AAC8-BC17316D0FE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
