@@ -27,9 +27,7 @@ namespace Pype.Benchmarks.Bus
             _container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             RegisterPype();
-
             RegisterMediatR();
-
             RegisterMicroBus();
 
             _container.Verify();
@@ -77,19 +75,19 @@ namespace Pype.Benchmarks.Bus
             }
         }       
 
-        [Benchmark(Description = "Send ping request via Pype.")]
+        [Benchmark(Description = "Pype.Send")]
         public Task SendPypeRequests()
         {
             return _pypeBus.SendAsync(new PingRequest());
         }
 
-        [Benchmark(Description = "Send ping request via MediatR.")]
+        [Benchmark(Description = "MediatR.Send")]
         public Task SendMediatRRequests()
         {
             return _mediatrBus.Send(new PingRequest());
         }
 
-        [Benchmark(Description = "Send ping request via MicroBus.")]
+        [Benchmark(Description = "MicroBus.Query")]
         public Task SendMicroBusRequests()
         {
             return _microBus.QueryAsync(new PingRequest());

@@ -10,6 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SendComparison\FuncInvok\**" />
+    <Compile Remove="SendComparison\Invoke\**" />
+    <EmbeddedResource Remove="SendComparison\FuncInvok\**" />
+    <EmbeddedResource Remove="SendComparison\Invoke\**" />
+    <None Remove="SendComparison\FuncInvok\**" />
+    <None Remove="SendComparison\Invoke\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
     <PackageReference Include="Enexure.MicroBus" Version="3.6.2" />
     <PackageReference Include="MediatR" Version="7.0.0" />

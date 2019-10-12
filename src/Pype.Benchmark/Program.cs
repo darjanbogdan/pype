@@ -1,9 +1,14 @@
-﻿//using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
+using Pype.Benchmarks.Bus;
 using Pype.Benchmarks.SendComparison;
+using Pype.Benchmarks.SendComparison.DelegateDynamicInvoke;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Pype.Benchmarks
@@ -12,24 +17,29 @@ namespace Pype.Benchmarks
     {
         static async Task Main(string[] args)
         {
+#if RELEASE
+            BenchmarkRunner.Run<BusComparisonBenchmarks>(); 
             BenchmarkRunner.Run<SendComparisonBenchmarks>();
+#else
+            var assemblies = new[] { typeof(Pype.Bus).Assembly, typeof(Bus.PingRequest).Assembly };
 
-            //var assemblies = new[] { typeof(Pype.Bus).Assembly, typeof(PingRequest).Assembly };
+            Container container = new Container();
+            container.Options.DefaultLifestyle = Lifestyle.Transient;
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
-            //Container container = new Container();
-            //container.Options.DefaultLifestyle = Lifestyle.Transient;
-            //container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+            container.Register(typeof(Pype.Requests.IRequestHandler<,>), assemblies);
+            container.RegisterSingleton<IBusDelegateDynamicInvoke>(() => new BusDelegateDynamicInvoke(container.GetInstance));
 
-            //container.Register(typeof(Pype.Requests.IRequestHandler<,>), assemblies);
-            //container.RegisterSingleton<SendComparison.IBus>(() => new SendComparison.Bus(container.GetInstance));
+            container.Verify();
 
-            //container.Verify();
+            IBusDelegateDynamicInvoke busComparison = container.GetInstance<IBusDelegateDynamicInvoke>();
 
-            //SendComparison.IBus busComparison = container.GetInstance<SendComparison.IBus>();
+            var response = await busComparison.SendAsync(new Bus.PingRequest());
 
-            //var response = await busComparison.SendDelegateDynamicInvokeAsync(new PingRequest());
+            var responseCached = await busComparison.SendCachedAsync(new Bus.PingRequest());
 
-            //Console.WriteLine(response.Match<bool>(r => true, e => false));
+            Console.WriteLine(response.Match<bool>(r => true, e => false));
+#endif
         }
     }
 }
