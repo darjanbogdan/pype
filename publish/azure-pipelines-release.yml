@@ -1,0 +1,40 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- tag
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: Release
+  
+steps:
+
+# dotnet build
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build'
+  inputs:
+    command: 'build'
+    projects: './src/Pype/Pype.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+#dotnet pack
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack'
+  inputs:
+    command: 'custom'
+    custom: 'pack'
+    projects: './src/Pype/Pype.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
+
+#nuget push
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet nuget push'
+  inputs:
+    command: 'custom'
+    custom: 'nuget'
+    arguments: 'push $(Build.ArtifactStagingDirectory)/*.nupkg -k $(nugetOrgApiKey) -s https://api.nuget.org/v3/index.json'
