@@ -1,8 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- General-->
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
+  
+  <!-- Nuget -->
+  <PropertyGroup>
+    <PackageId>Pype</PackageId>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
+    <Product>Pype</Product>
+    <Description>Pype in-process mediator for requests, notifications and handlers.</Description>
+    <Authors>Darjan Bogdan</Authors>
+  </PropertyGroup>
+  
 </Project>
