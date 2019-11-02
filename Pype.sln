@@ -11,6 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Validation", "src\Pype
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Benchmarks", "src\Pype.Benchmark\Pype.Benchmarks.csproj", "{A7C7252B-D580-4DFB-AAC8-BC17316D0FE3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "publish", "publish", "{32E78D48-CF97-493B-8C01-4E9F8D2B3530}"
+	ProjectSection(SolutionItems) = preProject
+		publish\azure-pipelines-beta.yml = publish\azure-pipelines-beta.yml
+		publish\azure-pipelines-release.yml = publish\azure-pipelines-release.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

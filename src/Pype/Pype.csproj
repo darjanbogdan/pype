@@ -8,12 +8,24 @@
   
   <!-- Nuget -->
   <PropertyGroup>
+    <!-- General -->
     <PackageId>Pype</PackageId>
+    <Title>Pype</Title>
+    <Description>Pype in-process mediator for requests, notifications and handlers.</Description>
+    <PackageTags>command;query;request;notification;handler;bus;mediator</PackageTags>
+    <Authors>Darjan Bogdan</Authors>
+    <RepositoryUrl>https://github.com/darjanbogdan/pype</RepositoryUrl>
+
+    <!-- Version -->
     <VersionPrefix>1.0.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <Product>Pype</Product>
-    <Description>Pype in-process mediator for requests, notifications and handlers.</Description>
-    <Authors>Darjan Bogdan</Authors>
+
+    <!-- License -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <!-- Symbols package -->
+    <IncludeSymbols >true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   
 </Project>
