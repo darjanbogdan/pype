@@ -4,9 +4,9 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-  branches:
+  tags:
     include:
-    - 'refs/tags/*'
+    - '*'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -32,11 +32,3 @@ steps:
     custom: 'pack'
     projects: './src/Pype/Pype.csproj'
     arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
-
-# publish package
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet nuget push'
-  inputs:
-    command: 'custom'
-    custom: 'nuget'
-    arguments: 'push $(Build.ArtifactStagingDirectory)/*.nupkg -k $(nugetOrgApiKey) -s https://api.nuget.org/v3/index.json'

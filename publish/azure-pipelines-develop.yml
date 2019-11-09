@@ -4,13 +4,14 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- master
+- feature/*
+- fix/*
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  buildConfiguration: Release
+  buildConfiguration: Debug
   buildCounter: 1
   buildNumber: $[counter(variables['buildCounter'], 0)]
 
@@ -22,7 +23,7 @@ steps:
   inputs:
     command: 'build'
     projects: './src/Pype/Pype.csproj'
-    arguments: '--configuration $(buildConfiguration) --version-suffix beta-$(buildNumber)'
+    arguments: '--configuration $(buildConfiguration) --version-suffix develop-$(buildNumber)'
 
 # make package
 - task: DotNetCoreCLI@2
@@ -31,4 +32,4 @@ steps:
     command: 'custom'
     custom: 'pack'
     projects: './src/Pype/Pype.csproj'
-    arguments: '--configuration $(buildConfiguration) --version-suffix beta-$(buildNumber) --no-build --output $(Build.ArtifactStagingDirectory)'
+    arguments: '--configuration $(buildConfiguration) --version-suffix develop-$(buildNumber) --no-build --output $(Build.ArtifactStagingDirectory)'

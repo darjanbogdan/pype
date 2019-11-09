@@ -14,79 +14,66 @@ namespace Pype
     {
         private readonly Func<Type, object> _instanceFactory;
 
+        #region Cache Fields
+
         private static readonly Type _busType = typeof(Bus);
         private static readonly ConcurrentDictionary<Type, Type> _handlerTypes = new ConcurrentDictionary<Type, Type>();
-        private static readonly ConcurrentDictionary<Type, Delegate> _handleDelegates = new ConcurrentDictionary<Type, Delegate>();
+        private static readonly ConcurrentDictionary<(Type, Type), Delegate> _sendAsyncDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
+        private static readonly ConcurrentDictionary<Type, Delegate> _publishAsyncDelegates = new ConcurrentDictionary<Type, Delegate>();
 
-        private delegate Task<Result<TResponse>> RequestHandleDelegate<TResponse>(object request, CancellationToken cancellation); // Func<object, CancellationToken, Task<Result<TResponse>>>
-        private delegate Task NotificationHandleDelegate(object notification, CancellationToken cancellation); // Func<object, CancellationToken, Task>
+        #endregion Cache Fields
+
+        private delegate Task<Result<TResponse>> SendAsyncDelegate<TResponse>(object request, Type requestType, CancellationToken cancellation);
+        private delegate Task PublishAsyncDelegate(object notification, Type notificationType, CancellationToken cancellation);
 
         public Bus(Func<Type, object> instanceFactory)
         {
             _instanceFactory = instanceFactory;
         }
 
+        #region Send Request
+
         public Task<Result<TResponse>> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellation = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var handle = GetRequestHandleDelegate<TResponse>(request.GetType());
+            (var requestType, var responseType) = (request.GetType(), typeof(TResponse));
 
-            return handle(request, cancellation);
+            SendAsyncDelegate<TResponse> sendDelegate = GetSendAsyncDelegate<TResponse>(requestType, responseType);
+
+            return sendDelegate(request, requestType, cancellation);
         }
 
-        public Task PublishAsync(INotification notification, CancellationToken cancellation = default)
+        private SendAsyncDelegate<TResponse> GetSendAsyncDelegate<TResponse>(Type requestType, Type responseType)
         {
-            if (notification == null) throw new ArgumentNullException(nameof(notification));
+            return (SendAsyncDelegate<TResponse>)_sendAsyncDelegates.GetOrAdd(
+                key: (requestType, responseType),
+                types => 
+                {
+                    (Type requestType, Type responseType) = types;
 
-            var handle = GetNotificationHandleDelegate(notification.GetType());
+                    var sendMethod = _busType
+                        .GetMethod(nameof(SendAsync), BindingFlags.NonPublic | BindingFlags.Instance)
+                        .MakeGenericMethod(requestType, responseType);
 
-            return handle(notification, cancellation);
+                    var sendDelegateType = typeof(SendAsyncDelegate<TResponse>);
+
+                    return Delegate.CreateDelegate(sendDelegateType, firstArgument: this, sendMethod);
+                });
         }
 
-        protected virtual Task PublishInternalAsync(IEnumerable<Func<Task>> handleTaskFactories)
+        private Task<Result<TResponse>> SendAsync<TRequest, TResponse>(object request, Type requestType, CancellationToken cancellation = default) where TRequest : IRequest<TResponse>
         {
-            return Task.WhenAll(handleTaskFactories.Select(factory => factory.Invoke()));
-        }
-
-        private RequestHandleDelegate<TResponse> GetRequestHandleDelegate<TResponse>(Type requestType)
-        {
-            return (RequestHandleDelegate<TResponse>)_handleDelegates.GetOrAdd(
-                key: requestType,
-                valueFactory: _ => CreateRequestHandleDelegate()
-                );
-
-            Delegate CreateRequestHandleDelegate()
-            {
-                MethodInfo handleDelegateFactoryMethod = _busType
-                    .GetMethod(nameof(GetRequestHandleDelegateFactory), BindingFlags.Instance | BindingFlags.NonPublic)
-                    .MakeGenericMethod(requestType, typeof(TResponse));
-
-                var handleDelegateFactory = (Func<RequestHandleDelegate<TResponse>>)Delegate.CreateDelegate(
-                    typeof(Func<RequestHandleDelegate<TResponse>>),
-                    firstArgument: this,
-                    handleDelegateFactoryMethod
-                    );
-
-                return handleDelegateFactory.Invoke();
-            }
-        }
-
-        private RequestHandleDelegate<TResponse> GetRequestHandleDelegateFactory<TRequest, TResponse>() where TRequest : IRequest<TResponse>
-        {
-            return (request, cancellation) =>
-            {
-                var handlerType = _handlerTypes.GetOrAdd(typeof(TRequest), _ => typeof(IRequestHandler<TRequest, TResponse>));
-                var handler = CreateHandler(handlerType);
-
-                return handler.HandleAsync((TRequest)request, cancellation);
-            };
-
+            var handlerType = _handlerTypes.GetOrAdd(requestType, _ => typeof(IRequestHandler<TRequest, TResponse>));
+            var handler = CreateHandler(handlerType);
+            
+            return handler.HandleAsync((TRequest)request, cancellation);
+            
             IRequestHandler<TRequest, TResponse> CreateHandler(Type handlerType)
             {
                 try
                 {
-                    return (IRequestHandler<TRequest, TResponse>)_instanceFactory(handlerType) 
+                    return (IRequestHandler<TRequest, TResponse>)_instanceFactory(handlerType)
                         ?? throw new ArgumentNullException(nameof(handlerType), $"Type {handlerType} resolved to null by the instance factory method.");
                 }
                 catch (Exception ex)
@@ -96,46 +83,59 @@ namespace Pype
             }
         }
 
-        private NotificationHandleDelegate GetNotificationHandleDelegate(Type notificationType)
-        {
-            return (NotificationHandleDelegate)_handleDelegates.GetOrAdd(
-                key: notificationType,
-                valueFactory: _ => CreateNotificationHandleDelegate()
-                );
-            
-            Delegate CreateNotificationHandleDelegate()
-            {
-                MethodInfo handleDelegateFactoryMethod = _busType
-                    .GetMethod(nameof(GetNotificationHandleDelegateFactory), BindingFlags.Instance | BindingFlags.NonPublic)
-                    .MakeGenericMethod(notificationType);
-                
-                var handleDelegateFactory = (Func<NotificationHandleDelegate>)Delegate.CreateDelegate(
-                    typeof(Func<NotificationHandleDelegate>),
-                    firstArgument: this,
-                    handleDelegateFactoryMethod
-                    );
+        #endregion Send Request
 
-                return handleDelegateFactory.Invoke(); 
-            } 
+        #region Publish Notification
+
+        public Task PublishAsync(INotification notification, CancellationToken cancellation = default)
+        {
+            if (notification == null) throw new ArgumentNullException(nameof(notification));
+
+            var notificationType = notification.GetType();
+
+            PublishAsyncDelegate publishDelegate = GetPublishAsyncDelegate(notificationType);
+
+            return publishDelegate(notification, notificationType, cancellation);
         }
 
-        private NotificationHandleDelegate GetNotificationHandleDelegateFactory<TNotification>() where TNotification : INotification
+        protected virtual Task PublishInternalAsync(IEnumerable<Func<Task>> handleTaskFactories)
         {
-            return (notification, cancellation) =>
+            return Task.WhenAll(handleTaskFactories.Select(factory => factory.Invoke()));
+        }
+
+        private PublishAsyncDelegate GetPublishAsyncDelegate(Type notificationType)
+        {
+            return (PublishAsyncDelegate)_publishAsyncDelegates.GetOrAdd(
+                key: notificationType,
+                type => CreateNotificationHandleDelegate(type)
+                );
+
+            Delegate CreateNotificationHandleDelegate(Type notificationType)
             {
-                var enumerableHandlerType = _handlerTypes.GetOrAdd(typeof(TNotification), _ => typeof(IEnumerable<INotificationHandler<TNotification>>));
-                var handlers = CreateHandlers(enumerableHandlerType);
+                MethodInfo publishMethod = _busType
+                    .GetMethod(nameof(PublishAsync), BindingFlags.Instance | BindingFlags.NonPublic)
+                    .MakeGenericMethod(notificationType);
 
-                var handleTaskFactories = handlers.Select(h => new Func<Task>(() => h.HandleAsync((TNotification)notification, cancellation)));
+                var publishDelegateType = typeof(PublishAsyncDelegate);
 
-                return PublishInternalAsync(handleTaskFactories);
-            };
+                return Delegate.CreateDelegate(publishDelegateType, firstArgument: this, publishMethod);
+            }
+        }
+
+        private Task PublishAsync<TNotification>(object notification, Type notificationType, CancellationToken cancellation = default) where TNotification : INotification
+        {
+            var enumerableHandlerType = _handlerTypes.GetOrAdd(notificationType, _ => typeof(IEnumerable<INotificationHandler<TNotification>>));
+            var handlers = CreateHandlers(enumerableHandlerType);
+
+            var handleTaskFactories = handlers.Select(h => new Func<Task>(() => h.HandleAsync((TNotification)notification, cancellation)));
+
+            return PublishInternalAsync(handleTaskFactories);
 
             IEnumerable<INotificationHandler<TNotification>> CreateHandlers(Type enumerableHandlerType)
             {
                 try
                 {
-                    return (IEnumerable<INotificationHandler<TNotification>>)_instanceFactory(enumerableHandlerType) 
+                    return (IEnumerable<INotificationHandler<TNotification>>)_instanceFactory(enumerableHandlerType)
                         ?? throw new ArgumentNullException(nameof(enumerableHandlerType), $"Type {enumerableHandlerType} resolved to null by the instance factory method.");
                 }
                 catch (Exception ex)
@@ -144,5 +144,7 @@ namespace Pype
                 }
             }
         }
+
+        #endregion Publish Notification
     }
 }
