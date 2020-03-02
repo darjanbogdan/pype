@@ -33,10 +33,9 @@ steps:
     projects: './src/Pype/Pype.csproj'
     arguments: '--configuration $(buildConfiguration) --version-suffix beta-$(buildNumber) --no-build --output $(Build.ArtifactStagingDirectory)'
 
-# publish package
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet nuget push'
+# publish artifact
+- task: PublishBuildArtifacts@1
   inputs:
-    command: 'custom'
-    custom: 'nuget'
-    arguments: 'push $(Build.ArtifactStagingDirectory)/*.nupkg -k $(nugetOrgApiKey) -s https://api.nuget.org/v3/index.json'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'PypeNugetBeta'
+    publishLocation: 'Container'

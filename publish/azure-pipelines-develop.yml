@@ -4,16 +4,17 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-  tags:
-    include:
-    - '*'
+- feature/*
+- fix/*
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  buildConfiguration: Release
-  
+  buildConfiguration: Debug
+  buildCounter: 1
+  buildNumber: $[counter(variables['buildCounter'], 0)]
+
 steps:
 
 # build project
@@ -22,7 +23,7 @@ steps:
   inputs:
     command: 'build'
     projects: './src/Pype/Pype.csproj'
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(buildConfiguration) --version-suffix develop-$(buildNumber)'
 
 # make package
 - task: DotNetCoreCLI@2
@@ -31,11 +32,11 @@ steps:
     command: 'custom'
     custom: 'pack'
     projects: './src/Pype/Pype.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
+    arguments: '--configuration $(buildConfiguration) --version-suffix develop-$(buildNumber) --no-build --output $(Build.ArtifactStagingDirectory)'
 
 # publish artifact
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'PypeNugetRelease'
+    ArtifactName: 'PypeNugetDevelop'
     publishLocation: 'Container'

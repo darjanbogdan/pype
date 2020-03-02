@@ -13,6 +13,7 @@ namespace Pype.Sandbox.Users
     {
         public Task<Result<User>> HandleAsync(CreateUserCommand command, CancellationToken cancellation)
         {
+            Console.WriteLine(nameof(CreateUserCommandHandler));
             return Result.OkAsync(new User());
         }
     }

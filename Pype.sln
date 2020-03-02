@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "publish", "publish", "{32E78D48-CF97-493B-8C01-4E9F8D2B3530}"
 	ProjectSection(SolutionItems) = preProject
 		publish\azure-pipelines-beta.yml = publish\azure-pipelines-beta.yml
+		publish\azure-pipelines-develop.yml = publish\azure-pipelines-develop.yml
 		publish\azure-pipelines-release.yml = publish\azure-pipelines-release.yml
 	EndProjectSection
 EndProject
