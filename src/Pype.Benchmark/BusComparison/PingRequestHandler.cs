@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pype.Benchmarks.Bus
+namespace Pype.Benchmarks.BusComparison
 {
     public class PingRequestHandler :
         Requests.IRequestHandler<PingRequest, PingResponse>,

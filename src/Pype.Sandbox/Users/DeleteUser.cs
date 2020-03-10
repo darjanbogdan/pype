@@ -13,7 +13,7 @@ namespace Pype.Sandbox.Users
     {
         public Task<Result<Unit>> HandleAsync(DeleteUserCommand command, CancellationToken cancellation = default)
         {
-            return Result.OkAsync(Unit.Value);
+            return Result.OkAsync(Unit.Instance);
         }
     }
 }

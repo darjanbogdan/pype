@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- General-->
+  <!-- Build -->
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
   
-  <!-- Nuget -->
+  <!-- Nuget Package -->
   <PropertyGroup>
-    <!-- General -->
     <PackageId>Pype</PackageId>
     <Title>Pype</Title>
     <Description>In-process mediator for requests, notifications and handlers.</Description>
@@ -17,14 +16,11 @@
     <Authors>Darjan Bogdan</Authors>
     <RepositoryUrl>https://github.com/darjanbogdan/pype</RepositoryUrl>
 
-    <!-- Version -->
     <VersionPrefix>1.2.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
 
-    <!-- License -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
-    <!-- Symbols package -->
     <IncludeSymbols Condition="'$(Configuration)' != 'Release'">true</IncludeSymbols>
     <SymbolPackageFormat Condition="'$(Configuration)' != 'Release   '">snupkg</SymbolPackageFormat>
   </PropertyGroup>

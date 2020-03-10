@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 
 namespace Pype
 {
+    /// <summary>
+    /// In-process bus implementation for requests, notifications and handlers
+    /// </summary>
+    /// <seealso cref="Pype.IBus" />
     public class Bus : IBus
     {
         private readonly Func<Type, object> _instanceFactory;
@@ -18,14 +22,18 @@ namespace Pype
 
         private static readonly Type _busType = typeof(Bus);
         private static readonly ConcurrentDictionary<Type, Type> _handlerTypes = new ConcurrentDictionary<Type, Type>();
-        private static readonly ConcurrentDictionary<(Type, Type), Delegate> _sendAsyncDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
-        private static readonly ConcurrentDictionary<Type, Delegate> _publishAsyncDelegates = new ConcurrentDictionary<Type, Delegate>();
+        private static readonly ConcurrentDictionary<(Type RequestType, Type ResponseType), Delegate> _sendAsyncDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
+        private static readonly ConcurrentDictionary<Type, PublishAsyncDelegate> _publishAsyncDelegates = new ConcurrentDictionary<Type, PublishAsyncDelegate>();
 
         #endregion Cache Fields
 
         private delegate Task<Result<TResponse>> SendAsyncDelegate<TResponse>(object request, Type requestType, CancellationToken cancellation);
         private delegate Task PublishAsyncDelegate(object notification, Type notificationType, CancellationToken cancellation);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Bus"/> class.
+        /// </summary>
+        /// <param name="instanceFactory">The instance factory delegate.</param>
         public Bus(Func<Type, object> instanceFactory)
         {
             _instanceFactory = instanceFactory;
@@ -48,23 +56,25 @@ namespace Pype
         {
             return (SendAsyncDelegate<TResponse>)_sendAsyncDelegates.GetOrAdd(
                 key: (requestType, responseType),
-                types => 
-                {
-                    (Type requestType, Type responseType) = types;
+                valueFactory: types => CreateSendAsyncDelegate(types.RequestType, types.ResponseType)
+                );
 
-                    var sendMethod = _busType
-                        .GetMethod(nameof(SendAsync), BindingFlags.NonPublic | BindingFlags.Instance)
-                        .MakeGenericMethod(requestType, responseType);
+            Delegate CreateSendAsyncDelegate(Type requestType, Type responseType)
+            {
+                var sendMethod = _busType
+                    .GetMethod(nameof(SendAsync), BindingFlags.NonPublic | BindingFlags.Instance)
+                    .MakeGenericMethod(requestType, responseType);
 
-                    var sendDelegateType = typeof(SendAsyncDelegate<TResponse>);
+                var sendDelegateType = typeof(SendAsyncDelegate<TResponse>);
 
-                    return Delegate.CreateDelegate(sendDelegateType, firstArgument: this, sendMethod);
-                });
+                return Delegate.CreateDelegate(sendDelegateType, firstArgument: this, sendMethod);
+            }
         }
 
         private Task<Result<TResponse>> SendAsync<TRequest, TResponse>(object request, Type requestType, CancellationToken cancellation = default) where TRequest : IRequest<TResponse>
         {
             var handlerType = _handlerTypes.GetOrAdd(requestType, _ => typeof(IRequestHandler<TRequest, TResponse>));
+            
             var handler = CreateHandler(handlerType);
             
             return handler.HandleAsync((TRequest)request, cancellation);
@@ -98,6 +108,11 @@ namespace Pype
             return publishDelegate(notification, notificationType, cancellation);
         }
 
+        /// <summary>
+        /// Internal publish notification method which dictates the way of handler tasks invocations.
+        /// </summary>
+        /// <param name="handleTaskFactories">The handle task factories.</param>
+        /// <returns></returns>
         protected virtual Task PublishInternalAsync(IEnumerable<Func<Task>> handleTaskFactories)
         {
             return Task.WhenAll(handleTaskFactories.Select(factory => factory.Invoke()));
@@ -105,12 +120,12 @@ namespace Pype
 
         private PublishAsyncDelegate GetPublishAsyncDelegate(Type notificationType)
         {
-            return (PublishAsyncDelegate)_publishAsyncDelegates.GetOrAdd(
+            return _publishAsyncDelegates.GetOrAdd(
                 key: notificationType,
-                type => CreateNotificationHandleDelegate(type)
+                valueFactory: type => CreatePublishAsyncDelegate(type)
                 );
 
-            Delegate CreateNotificationHandleDelegate(Type notificationType)
+            PublishAsyncDelegate CreatePublishAsyncDelegate(Type notificationType)
             {
                 MethodInfo publishMethod = _busType
                     .GetMethod(nameof(PublishAsync), BindingFlags.Instance | BindingFlags.NonPublic)
@@ -118,13 +133,14 @@ namespace Pype
 
                 var publishDelegateType = typeof(PublishAsyncDelegate);
 
-                return Delegate.CreateDelegate(publishDelegateType, firstArgument: this, publishMethod);
+                return (PublishAsyncDelegate)Delegate.CreateDelegate(publishDelegateType, firstArgument: this, publishMethod);
             }
         }
 
         private Task PublishAsync<TNotification>(object notification, Type notificationType, CancellationToken cancellation = default) where TNotification : INotification
         {
             var enumerableHandlerType = _handlerTypes.GetOrAdd(notificationType, _ => typeof(IEnumerable<INotificationHandler<TNotification>>));
+            
             var handlers = CreateHandlers(enumerableHandlerType);
 
             var handleTaskFactories = handlers.Select(h => new Func<Task>(() => h.HandleAsync((TNotification)notification, cancellation)));

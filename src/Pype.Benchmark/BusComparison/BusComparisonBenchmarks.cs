@@ -5,7 +5,7 @@ using SimpleInjector;
 using SimpleInjector.Lifestyles;
 using System.Threading.Tasks;
 
-namespace Pype.Benchmarks.Bus
+namespace Pype.Benchmarks.BusComparison
 {
     public class BusComparisonBenchmarks
     {
