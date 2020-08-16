@@ -1,5 +1,10 @@
 # Pype
 
+[![NuGet](https://img.shields.io/nuget/v/pype)](https://www.nuget.org/packages/pype)
+[![Build Status](https://dev.azure.com/linkme-poc/Pype/_apis/build/status/Release?branchName=refs%2Ftags%2F1.2.1)](https://dev.azure.com/linkme-poc/Pype/_build/latest?definitionId=4&branchName=refs%2Ftags%2F1.2.1)
+[![Tests](https://img.shields.io/azure-devops/tests/linkme-poc/b94b499f-3c9f-4d45-ae7c-fa8e87676325/4)]()
+[![Coverage](https://img.shields.io/azure-devops/coverage/linkme-poc/b94b499f-3c9f-4d45-ae7c-fa8e87676325/4)]()
+
 _To get the overview what Pype is trying to tackle and model, please check the article [series](https://dev.to/darjanbogdan/command-query-domain-introduction-5eo2) which is the basis for this implementation._
 <hr>
 
@@ -12,7 +17,7 @@ Evolves around two interfaces:
 
 _Request_ - an object which carries information and seeks for the response:
 
-```
+```csharp
 /// Defines a request with response
 public interface IRequest<out TResponse>
 {
@@ -20,7 +25,8 @@ public interface IRequest<out TResponse>
 ```
 
 _RequestHandler_ - an object which handles the _Request_ and produces the response:
-```
+
+```csharp
 /// Defines a handler for request with response
 public interface IRequestHandler<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
@@ -30,7 +36,8 @@ public interface IRequestHandler<TRequest, TResponse> where TRequest : IRequest<
 ```
 
 Simple implementation example:
-```
+
+```csharp
 public class CreateUserCommand : IRequest<User> 
 { 
     public string UserName { get; set; }
@@ -70,7 +77,8 @@ A simple `IBus` dependency easily replaces all kinds of different `IRequestHandl
 It doesn't capture instances and is preferrably used with dependency injection container.
 
 Examples:
-```
+
+```csharp
 var createUser = new CreateUserRequest { UserName = "foo", Email = "bar@baz"};
 
 //plain
@@ -84,14 +92,13 @@ Result<User> result = await handler.HandleAsync(createUser);
 //dependency injection with IBus
 var bus = _container.GetInstance<IBus>();
 Result<User> result = await bus.SendAsync(createUser);
-
 ```
 
 ## Composition with SimpleInjector
 
 SimpleInjector DI container is used to manage instances, their lifetime and to add cross-cutting concerns as decorators:
 
-```
+```csharp
 async Task Main(string[] args)
 {
     // setup
@@ -118,7 +125,7 @@ async Task Main(string[] args)
 
 Once result is returned, it can be easily transformed in something else:
 
-```
+```csharp
 public class TestController : ApiController
 {
     private readonly IBus _bus;    
@@ -139,7 +146,6 @@ public class TestController : ApiController
         );
     }
 }
-
 ```
 
 

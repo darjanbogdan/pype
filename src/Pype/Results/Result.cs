@@ -7,12 +7,11 @@ namespace Pype
     /// Structure which holds either data or an error.
     /// </summary>
     /// <typeparam name="TData">The type of the data.</typeparam>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "FromTData and FromError methods should be here due to CA2225")]
     public sealed class Result<TData>
     {
         private readonly TData _data;
-
         private readonly Error _error;
-
         private readonly bool _successful;
 
         private Result(TData data)
@@ -33,20 +32,39 @@ namespace Pype
         /// <param name="success">The successful callback.</param>
         /// <param name="error">The error callback.</param>
         /// <returns></returns>
+#pragma warning disable CA1062 // Validate arguments of public methods. This is needed due to used 'preview' version of language, 'is not' statement is not recognized as a guard
         public T Match<T>(Func<TData, T> success, Func<Error, T> error)
             => _successful switch
             {
                 true => success is not null ? success(_data) : throw new ArgumentNullException(nameof(success)),
                 false => error is not null ? error(_error) : throw new ArgumentNullException(nameof(error))
             };
-        
+#pragma warning restore CA1062 // Validate arguments of public methods
+
+        /// <summary>
+        /// Creates <see cref="Result{TData}"/> from <typeparamref name="TData"/>
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <remarks>CA2225: Operator overloads have named alternates</remarks>
+        /// <returns></returns>
+        public static Result<TData> FromTData(TData data)
+            => Ok(data);
+
+        /// <summary>
+        /// Creates <see cref="Result{TData}"/> from <see cref="Error"/>
+        /// </summary>
+        /// <param name="error">The error.</param>
+        /// <remarks>CA2225: Operator overloads have named alternates</remarks>
+        /// <returns></returns>
+        public static Result<TData> FromError(Error error)
+            => Fail(error);
 
         /// <summary>
         /// Creates <see cref="Result{TData}"/> instance and wraps the data.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
-        public static Result<TData> Ok(TData data)
+        internal static Result<TData> Ok(TData data)
             => new Result<TData>(data);
 
         /// <summary>
@@ -54,7 +72,7 @@ namespace Pype
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
-        public static Task<Result<TData>> OkAsync(TData data)
+        internal static Task<Result<TData>> OkAsync(TData data)
             => Task.FromResult(Ok(data));
 
         /// <summary>
@@ -62,7 +80,7 @@ namespace Pype
         /// </summary>
         /// <param name="error">The error.</param>
         /// <returns></returns>
-        public static Result<TData> Fail(Error error)
+        internal static Result<TData> Fail(Error error)
             => new Result<TData>(error);
 
         /// <summary>
@@ -70,11 +88,11 @@ namespace Pype
         /// </summary>
         /// <param name="error">The error.</param>
         /// <returns></returns>
-        public static Task<Result<TData>> FailAsync(Error error)
+        internal static Task<Result<TData>> FailAsync(Error error)
             => Task.FromResult(Fail(error));
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="TData"/> to <see cref="Result{TData}"/>.
+        /// Performs an implicit conversion from <typeparamref name="TData"/> to <see cref="Result{TData}"/>.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns>

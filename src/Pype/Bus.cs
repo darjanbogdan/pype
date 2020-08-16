@@ -42,7 +42,8 @@ namespace Pype
         }
 
         #region Send Request
-
+        
+        /// <inheritdoc />
         public Task<Result<TResponse>> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellation = default)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
@@ -99,6 +100,7 @@ namespace Pype
 
         #region Publish Notification
 
+        /// <inheritdoc />
         public Task PublishAsync(INotification notification, CancellationToken cancellation = default)
         {
             if (notification is null) throw new ArgumentNullException(nameof(notification));

@@ -2,11 +2,22 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Pype.Validation</PackageId>
+    <Title>Pype Validation</Title>
+    <Description>An extension package which contains validation handler and default validators.</Description>
+    <PackageTags>command;query;request;notification;handler;validation</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pype\Pype.csproj" />
+    <PackageReference Include="FluentValidation" Version="9.2.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pype.Validation.Abstractions\Pype.Validation.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
