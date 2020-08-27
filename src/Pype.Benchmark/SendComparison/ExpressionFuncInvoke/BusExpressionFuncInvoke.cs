@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Pype.Requests;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Pype.Requests;
 
 namespace Pype.Benchmarks.SendComparison.ExpressionFuncInvoke
 {
@@ -53,7 +51,7 @@ namespace Pype.Benchmarks.SendComparison.ExpressionFuncInvoke
         public Task<Result<TResponse>> SendCachedAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellation = default)
         {
             var sendDelegate = (Func<object, CancellationToken, Task<Result<TResponse>>>)_sendDelegates.GetOrAdd(
-                (request.GetType(), typeof(TResponse)), 
+                (request.GetType(), typeof(TResponse)),
                 types =>
                 {
                     (Type requestType, Type responseType) = types;

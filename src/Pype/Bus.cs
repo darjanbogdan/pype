@@ -21,9 +21,9 @@ namespace Pype
         #region Cache Fields
 
         private static readonly Type _busType = typeof(Bus);
-        private static readonly ConcurrentDictionary<Type, Type> _handlerTypes = new ConcurrentDictionary<Type, Type>();
-        private static readonly ConcurrentDictionary<(Type RequestType, Type ResponseType), Delegate> _sendAsyncDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
-        private static readonly ConcurrentDictionary<Type, PublishAsyncDelegate> _publishAsyncDelegates = new ConcurrentDictionary<Type, PublishAsyncDelegate>();
+        private readonly ConcurrentDictionary<Type, Type> _handlerTypes = new ConcurrentDictionary<Type, Type>();
+        private readonly ConcurrentDictionary<(Type RequestType, Type ResponseType), Delegate> _sendAsyncDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
+        private readonly ConcurrentDictionary<Type, PublishAsyncDelegate> _publishAsyncDelegates = new ConcurrentDictionary<Type, PublishAsyncDelegate>();
 
         #endregion Cache Fields
 
@@ -36,6 +36,8 @@ namespace Pype
         /// <param name="instanceFactory">The instance factory delegate.</param>
         public Bus(Func<Type, object> instanceFactory)
         {
+            if (instanceFactory is null) throw new ArgumentNullException(nameof(instanceFactory));
+
             _instanceFactory = instanceFactory;
         }
 
@@ -43,7 +45,7 @@ namespace Pype
 
         public Task<Result<TResponse>> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellation = default)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (request is null) throw new ArgumentNullException(nameof(request));
 
             (var requestType, var responseType) = (request.GetType(), typeof(TResponse));
 
@@ -74,19 +76,19 @@ namespace Pype
         private Task<Result<TResponse>> SendAsync<TRequest, TResponse>(object request, Type requestType, CancellationToken cancellation = default) where TRequest : IRequest<TResponse>
         {
             var handlerType = _handlerTypes.GetOrAdd(requestType, _ => typeof(IRequestHandler<TRequest, TResponse>));
-            
+
             var handler = CreateHandler(handlerType);
-            
+
             return handler.HandleAsync((TRequest)request, cancellation);
-            
+
             IRequestHandler<TRequest, TResponse> CreateHandler(Type handlerType)
             {
                 try
                 {
                     return (IRequestHandler<TRequest, TResponse>)_instanceFactory(handlerType)
-                        ?? throw new ArgumentNullException(nameof(handlerType), $"Type {handlerType} resolved to null by the instance factory method.");
+                        ?? throw new ArgumentNullException(nameof(handlerType), $"Handler does not exist. Type {handlerType} resolved to null by the instance factory method.");
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ArgumentNullException)
                 {
                     throw new ArgumentException($"Handler creation failed. Type {handlerType} must be resolvable by the instance factory method.", ex);
                 }
@@ -99,7 +101,7 @@ namespace Pype
 
         public Task PublishAsync(INotification notification, CancellationToken cancellation = default)
         {
-            if (notification == null) throw new ArgumentNullException(nameof(notification));
+            if (notification is null) throw new ArgumentNullException(nameof(notification));
 
             var notificationType = notification.GetType();
 
@@ -140,7 +142,7 @@ namespace Pype
         private Task PublishAsync<TNotification>(object notification, Type notificationType, CancellationToken cancellation = default) where TNotification : INotification
         {
             var enumerableHandlerType = _handlerTypes.GetOrAdd(notificationType, _ => typeof(IEnumerable<INotificationHandler<TNotification>>));
-            
+
             var handlers = CreateHandlers(enumerableHandlerType);
 
             var handleTaskFactories = handlers.Select(h => new Func<Task>(() => h.HandleAsync((TNotification)notification, cancellation)));
@@ -151,12 +153,26 @@ namespace Pype
             {
                 try
                 {
-                    return (IEnumerable<INotificationHandler<TNotification>>)_instanceFactory(enumerableHandlerType)
-                        ?? throw new ArgumentNullException(nameof(enumerableHandlerType), $"Type {enumerableHandlerType} resolved to null by the instance factory method.");
+                    var handlers = (IEnumerable<INotificationHandler<TNotification>>)_instanceFactory(enumerableHandlerType)
+                        ?? throw new ArgumentNullException(
+                            nameof(enumerableHandlerType), 
+                            $"Handler collection does not exist. Type {enumerableHandlerType} resolved to null by the instance factory method."
+                            );
+
+                    return handlers.Any()
+                        ? handlers
+                        : throw new ArgumentNullException(
+                            nameof(enumerableHandlerType),
+                            $"Handler collection is empty. Type {enumerableHandlerType} resolved to null by the instance factory method."
+                            );
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ArgumentNullException)
                 {
-                    throw new ArgumentException($"Handler collection creation failed. Type {enumerableHandlerType} must be resolvable by the instance factory method.", ex);
+                    throw new ArgumentException(
+                        $"Handler collection creation failed. Type {enumerableHandlerType} must be resolvable by the instance factory method.",
+                        nameof(enumerableHandlerType), 
+                        innerException: ex
+                        );
                 }
             }
         }

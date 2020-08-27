@@ -17,13 +17,13 @@ namespace Pype
 
         private Result(TData data)
         {
+            _data = data ?? throw new ArgumentNullException(nameof(data));
             _successful = true;
-            _data = data;
         }
 
         private Result(Error error)
         {
-            _error = error;
+            _error = error ?? throw new ArgumentNullException(nameof(error));
         }
 
         /// <summary>
@@ -34,9 +34,12 @@ namespace Pype
         /// <param name="error">The error callback.</param>
         /// <returns></returns>
         public T Match<T>(Func<TData, T> success, Func<Error, T> error)
-            => _successful
-                ? success(_data)
-                : error(_error);
+            => _successful switch
+            {
+                true => success is not null ? success(_data) : throw new ArgumentNullException(nameof(success)),
+                false => error is not null ? error(_error) : throw new ArgumentNullException(nameof(error))
+            };
+        
 
         /// <summary>
         /// Creates <see cref="Result{TData}"/> instance and wraps the data.

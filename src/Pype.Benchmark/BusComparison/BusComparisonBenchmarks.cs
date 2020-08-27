@@ -12,9 +12,9 @@ namespace Pype.Benchmarks.BusComparison
         private Container _container;
 
         private IBus _pypeBus;
-        
+
         private IMediator _mediatrBus;
-        
+
         private IMicroBus _microBus;
 
         [GlobalSetup]
@@ -73,7 +73,7 @@ namespace Pype.Benchmarks.BusComparison
 
                 _container.Register(typeof(IQueryHandler<,>), assemblies);
             }
-        }       
+        }
 
         [Benchmark(Description = "Pype.Send")]
         public Task SendPypeRequests()

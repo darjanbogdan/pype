@@ -24,6 +24,21 @@ steps:
     projects: './src/Pype/Pype.csproj'
     arguments: '--configuration $(buildConfiguration) --version-suffix beta-$(buildNumber)'
 
+# test project
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: 'test'
+    projects: './src/Pype.Tests/Pype.Tests.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+# publish code coverage
+- task: PublishCodeCoverageResults@1
+  displayName: 'publish code coverage'
+  inputs:
+    codeCoverageTool: 'cobertura'
+    summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+
 # make package
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack'

@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Pype.Requests;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Pype.Requests;
 
 namespace Pype.Benchmarks.SendComparison.FuncInvoke
 {
     public class BusFuncInvoke : IBusFuncInvoke
     {
         private static readonly Type _busType = typeof(BusFuncInvoke);
-        
+
         private static readonly ConcurrentDictionary<(Type, Type), Delegate> _sendInternalDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
 
         private readonly Func<Type, object> _instanceFactory;
@@ -52,7 +50,7 @@ namespace Pype.Benchmarks.SendComparison.FuncInvoke
                         .MakeGenericMethod(requestType, responseType);
 
                     var sendInternalFuncType = typeof(Func<object, CancellationToken, Task<Result<TResponse>>>);
-                    
+
                     return Delegate.CreateDelegate(sendInternalFuncType, this, sendInternalMethod);
                 });
 

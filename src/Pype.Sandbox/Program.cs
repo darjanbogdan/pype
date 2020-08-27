@@ -2,7 +2,6 @@
 using Pype.Requests;
 using Pype.Sandbox.Users;
 using SimpleInjector;
-using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -15,7 +14,7 @@ namespace Pype.Sandbox
             var asm = typeof(Program).Assembly;
 
             var pype = CreatePype(asm);
-            
+
             await pype.SendAsync(new CreateUserCommand());
 
             await pype.PublishAsync(new UserCreatedNotification());

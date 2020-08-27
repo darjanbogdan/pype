@@ -1,10 +1,8 @@
 ﻿using Pype.Requests;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +13,7 @@ namespace Pype.Benchmarks.SendComparison.DelegateDynamicInvoke
         private static readonly Type _busType = typeof(BusDelegateDynamicInvoke);
 
         private static readonly ConcurrentDictionary<(Type, Type), Delegate> _sendInternalDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
-        
+
         private readonly Func<Type, object> _instanceFactory;
 
         public BusDelegateDynamicInvoke(Func<Type, object> instanceFactory)
@@ -63,6 +61,6 @@ namespace Pype.Benchmarks.SendComparison.DelegateDynamicInvoke
             var handler = (IRequestHandler<TRequest, TResponse>)_instanceFactory(typeof(IRequestHandler<TRequest, TResponse>));
 
             return handler.HandleAsync(request, cancellationToken);
-        } 
+        }
     }
 }

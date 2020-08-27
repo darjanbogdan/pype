@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Pype.Requests;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Pype.Requests;
 
 namespace Pype.Benchmarks.SendComparison.MethodInfoInvoke
 {
@@ -36,7 +34,7 @@ namespace Pype.Benchmarks.SendComparison.MethodInfoInvoke
         public Task<Result<TResponse>> SendCachedAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellation = default)
         {
             var sendInternalMethod = _sendInternalMethods.GetOrAdd(
-                (request.GetType(), typeof(TResponse)), 
+                (request.GetType(), typeof(TResponse)),
                 types =>
                 {
                     (Type requestType, Type responseType) = types;

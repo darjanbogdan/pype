@@ -9,9 +9,6 @@ using Pype.Benchmarks.SendComparison.MethodInfoInvoke;
 using Pype.Requests;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pype.Benchmarks.SendComparison
@@ -38,7 +35,7 @@ namespace Pype.Benchmarks.SendComparison
             _container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             _container.Register(typeof(IRequestHandler<,>), assemblies);
-            
+
             _container.RegisterSingleton<IBusDelegateDynamicInvoke>(() => new BusDelegateDynamicInvoke(_container.GetInstance));
             _container.RegisterSingleton<IBusDelegateInvoke>(() => new BusDelegateInvoke(_container.GetInstance));
             _container.RegisterSingleton<IBusDirectInvoke>(() => new BusDirectInvoke(_container.GetInstance));
@@ -46,7 +43,7 @@ namespace Pype.Benchmarks.SendComparison
             _container.RegisterSingleton<IBusFuncInvoke>(() => new BusFuncInvoke(_container.GetInstance));
             _container.RegisterSingleton<IBusExpressionFuncInvoke>(() => new BusExpressionFuncInvoke(_container.GetInstance));
             _container.RegisterSingleton<IBusMethodInfoInvoke>(() => new BusMethodInfoInvoke(_container.GetInstance));
-            
+
             _container.Verify();
 
             _busDelegateDynamicInvoke = _container.GetInstance<IBusDelegateDynamicInvoke>();
