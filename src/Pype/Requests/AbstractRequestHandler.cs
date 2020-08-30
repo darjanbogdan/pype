@@ -13,7 +13,7 @@ namespace Pype.Requests
     {
         async Task<Result<TResponse>> IRequestHandler<TRequest, TResponse>.HandleAsync(TRequest request, CancellationToken cancellation)
         {
-            return await HandleAsync(request, cancellation);
+            return await HandleAsync(request, cancellation).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Pype.Requests
     {
         async Task<Result<Unit>> IRequestHandler<TRequest, Unit>.HandleAsync(TRequest request, CancellationToken cancellation)
         {
-            await HandleAsync(request, cancellation);
+            await HandleAsync(request, cancellation).ConfigureAwait(false);
             return Unit.Instance;
         }
 

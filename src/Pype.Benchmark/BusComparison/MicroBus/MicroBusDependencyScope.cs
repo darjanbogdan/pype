@@ -3,12 +3,12 @@ using SimpleInjector;
 using SimpleInjector.Lifestyles;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Pype.Benchmarks.BusComparison
 {
     public class MicroBusDependencyScope : MicroBusDependencyResolver, IDependencyScope
     {
+        private bool _isDisposed;
         private readonly Scope _scope;
         private readonly Container _container;
 
@@ -21,7 +21,20 @@ namespace Pype.Benchmarks.BusComparison
 
         public void Dispose()
         {
-            _scope.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+             
+            if (disposing)
+            {
+                _scope.Dispose();
+            }
+
+            _isDisposed = true;
         }
 
         public object GetService(Type serviceType)

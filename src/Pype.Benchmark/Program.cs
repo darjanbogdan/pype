@@ -1,14 +1,6 @@
-﻿using BenchmarkDotNet.Running;
-using Pype.Benchmarks.BusComparison;
-using Pype.Benchmarks.SendComparison;
-using Pype.Benchmarks.SendComparison.DelegateDynamicInvoke;
-using SimpleInjector;
+﻿using SimpleInjector;
 using SimpleInjector.Lifestyles;
 using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pype.Benchmarks
