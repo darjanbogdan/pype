@@ -5,6 +5,7 @@ namespace Pype
     /// <summary>
     /// Structure which holds error data.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "Error is not reserved keyword in C#")]
     public class Error
     {
         /// <summary>

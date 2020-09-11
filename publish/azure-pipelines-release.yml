@@ -13,40 +13,54 @@ pool:
 
 variables:
   buildConfiguration: Release
+  version: 1.2.1
   
 steps:
 
-# build project
+# restore solution projects
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
+  displayName: 'Restore solution projects'
+  inputs:
+    command: 'restore'
+    arguments: '--configuration $(buildConfiguration)'
+    verbosityRestore: 'minimal'
+
+# build solution projects
+- task: DotNetCoreCLI@2
+  displayName: 'Build solution projects'
   inputs:
     command: 'build'
-    projects: './src/Pype/Pype.csproj'
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(buildConfiguration) /p:Version=$(version) --no-restore'
 
-# test project
+# test solution project
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet test'
+  displayName: 'Test and analyze solution projects'
   inputs:
     command: 'test'
-    projects: './src/Pype.Tests/Pype.Tests.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect="XPlat Code Coverage"'
+    arguments: '--configuration $(buildConfiguration) --collect="XPlat Code Coverage" --no-restore --no-build'
 
-# publish code coverage
+# generate summary coverage report
+- task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+  displayName: 'Generate summary coverage report'
+  inputs:
+    reports: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+    targetdir: '$(Agent.TempDirectory)/cchtml'
+    assemblyfilters: '-FluentValidation'
+
+# publish summary coverage report
 - task: PublishCodeCoverageResults@1
-  displayName: 'publish code coverage'
+  displayName: 'Publish summary coverage report'
   inputs:
     codeCoverageTool: 'cobertura'
-    summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+    summaryFileLocation: '$(Agent.TempDirectory)/cchtml/Cobertura.xml'
 
-# make package
+# pack solution projects
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet pack'
+  displayName: 'Pack solution projects'
   inputs:
     command: 'custom'
     custom: 'pack'
-    projects: './src/Pype/Pype.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
+    arguments: '--configuration $(buildConfiguration) /p:Version=$(version) --no-restore --no-build --output $(Build.ArtifactStagingDirectory)'
 
 # publish artifact
 - task: PublishBuildArtifacts@1
