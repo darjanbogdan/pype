@@ -14,16 +14,11 @@ pool:
 variables:
   buildConfiguration: Release
   version: 1.3.0
-  
+  artifactName: 'PypeNugetRelease'
 steps:
 
 # restore solution projects
-- task: DotNetCoreCLI@2
-  displayName: 'Restore solution projects'
-  inputs:
-    command: 'restore'
-    arguments: '--configuration $(buildConfiguration)'
-    verbosityRestore: 'minimal'
+- template: templates/solution-restore.yml
 
 # build solution projects
 - task: DotNetCoreCLI@2
@@ -33,26 +28,7 @@ steps:
     arguments: '--configuration $(buildConfiguration) /p:Version=$(version) --no-restore'
 
 # test solution project
-- task: DotNetCoreCLI@2
-  displayName: 'Test and analyze solution projects'
-  inputs:
-    command: 'test'
-    arguments: '--configuration $(buildConfiguration) --collect="XPlat Code Coverage" --no-restore --no-build'
-
-# generate summary coverage report
-- task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
-  displayName: 'Generate summary coverage report'
-  inputs:
-    reports: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
-    targetdir: '$(Agent.TempDirectory)/cchtml'
-    assemblyfilters: '-FluentValidation'
-
-# publish summary coverage report
-- task: PublishCodeCoverageResults@1
-  displayName: 'Publish summary coverage report'
-  inputs:
-    codeCoverageTool: 'cobertura'
-    summaryFileLocation: '$(Agent.TempDirectory)/cchtml/Cobertura.xml'
+- template: templates/solution-test-collect-report.yml
 
 # pack solution projects
 - task: DotNetCoreCLI@2
@@ -62,9 +38,5 @@ steps:
     custom: 'pack'
     arguments: '--configuration $(buildConfiguration) /p:Version=$(version) --no-restore --no-build --output $(Build.ArtifactStagingDirectory)'
 
-# publish artifact
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'PypeNugetRelease'
-    publishLocation: 'Container'
+# publish artifacts   
+- template: templates/artifacts-publish.yml

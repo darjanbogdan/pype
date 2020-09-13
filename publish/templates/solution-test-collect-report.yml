@@ -1,0 +1,23 @@
+steps:
+
+# test solution project
+- task: DotNetCoreCLI@2
+  displayName: 'Test and analyze solution projects'
+  inputs:
+    command: 'test'
+    arguments: '--configuration $(buildConfiguration) --collect="XPlat Code Coverage" --no-restore --no-build'
+
+# generate summary coverage report
+- task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+  displayName: 'Generate summary coverage report'
+  inputs:
+    reports: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+    targetdir: '$(Agent.TempDirectory)/cchtml'
+    assemblyfilters: '-FluentValidation'
+
+# publish summary coverage report
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish summary coverage report'
+  inputs:
+    codeCoverageTool: 'cobertura'
+    summaryFileLocation: '$(Agent.TempDirectory)/cchtml/Cobertura.xml'

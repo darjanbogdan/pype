@@ -1,0 +1,9 @@
+steps:
+
+# restore solution projects
+- task: DotNetCoreCLI@2
+  displayName: 'Restore solution projects'
+  inputs:
+    command: 'restore'
+    arguments: '--configuration $(buildConfiguration)'
+    verbosityRestore: 'minimal'
