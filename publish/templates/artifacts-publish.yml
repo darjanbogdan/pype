@@ -1,0 +1,10 @@
+steps:
+
+# publish artifacts
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish build artifacts'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # don't publish on PR status checks
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: '$(artifactName)'
+    publishLocation: 'Container'

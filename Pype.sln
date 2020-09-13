@@ -47,6 +47,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Validation.Abstraction
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pype.Validation.Abstractions", "src\Pype.Validation.Abstractions\Pype.Validation.Abstractions.csproj", "{B1400377-3330-4FEF-9866-AE992D3BDC41}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{F859F37E-8A9C-432C-B7C7-00D22976AD22}"
+	ProjectSection(SolutionItems) = preProject
+		publish\templates\artifacts-publish.yml = publish\templates\artifacts-publish.yml
+		publish\templates\solution-restore.yml = publish\templates\solution-restore.yml
+		publish\templates\solution-test-collect-report.yml = publish\templates\solution-test-collect-report.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +104,7 @@ Global
 		{2B44FDD8-39BB-466D-83D4-59A7DDF3B28A} = {303365E1-5845-498B-8AB5-74729D361A38}
 		{8D2B4084-30EE-49D1-9B7F-1F1A5B855295} = {AB2DF734-A091-4FCD-B292-AEA1A1EFF916}
 		{B1400377-3330-4FEF-9866-AE992D3BDC41} = {AB2DF734-A091-4FCD-B292-AEA1A1EFF916}
+		{F859F37E-8A9C-432C-B7C7-00D22976AD22} = {32E78D48-CF97-493B-8C01-4E9F8D2B3530}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29790640-855D-4D2D-A4A5-F851C69E597B}
