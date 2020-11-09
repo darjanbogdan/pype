@@ -1,6 +1,4 @@
-using Castle.DynamicProxy.Generators;
 using FluentAssertions;
-using Microsoft.VisualBasic;
 using Moq;
 using Pype.Requests;
 using Pype.Results;

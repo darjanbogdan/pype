@@ -7,8 +7,8 @@
   <PropertyGroup>
     <PackageId>Pype</PackageId>
     <Title>Pype</Title>
-    <Description>In-process mediator for requests, notifications and handlers.</Description>
+    <Description>A base class library for requests, notifications and results, with default in-process mediator for their handlers.</Description>
     <PackageTags>command;query;request;notification;handler;bus;mediator</PackageTags>
   </PropertyGroup>
-  
+
 </Project>

@@ -26,11 +26,7 @@ namespace Pype.Validation
         /// <param name="validators">The validators.</param>
         /// <param name="validationSettings">The validation settings.</param>
         /// <param name="innerHandler">The inner handler.</param>
-        public ValidationHandler(
-            IEnumerable<IValidator<TRequest>> validators,
-            ValidationHandlerSettings validationSettings,
-            IRequestHandler<TRequest, TResponse> innerHandler
-            )
+        public ValidationHandler(IEnumerable<IValidator<TRequest>> validators, ValidationHandlerSettings validationSettings, IRequestHandler<TRequest, TResponse> innerHandler)
         {
             _validationSettings = validationSettings;
             _validators = validators;
