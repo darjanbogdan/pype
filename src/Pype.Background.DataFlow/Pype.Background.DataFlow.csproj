@@ -4,17 +4,15 @@
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <PackageId>Pype.Validation.Abstractions</PackageId>
-    <Title>Pype Validation Abstractions</Title>
-    <Description>An extension package which contains validation abstractions and common types</Description>
-    <PackageTags>command;query;request;notification;handler;validation</PackageTags>
-  </PropertyGroup>
-  
   <ItemGroup>
-    <ProjectReference Include="..\Pype\Pype.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pype.Background.Abstractions\Pype.Background.Abstractions.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Update="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.1">
       <PrivateAssets>all</PrivateAssets>

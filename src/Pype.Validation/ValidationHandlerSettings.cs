@@ -9,7 +9,6 @@ namespace Pype.Validation
     /// </summary>
     public class ValidationHandlerSettings
     {
-
         /// <summary>
         /// Gets or sets a value indicating whether validation should stop on first failure or continue to process all validators.
         /// </summary>
